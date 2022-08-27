@@ -136,3 +136,7 @@ body {
     padding: 5px;
     visibility: hidden;
 }
+
+.very-light, .light, .very-hard, .hard{
+    visibility: hidden;
+}

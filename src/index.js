@@ -1,101 +1,114 @@
-import './style.css';
-import ancientsData from './data/ancients';
-import {
-    brownCards,
-    blueCards,
-    greenCards
-} from './data/mythicCards/index';
-import difficulties from './data/difficulties';
+import "./style.css";
+import ancientsData from "./data/ancients";
+import { brownCards, blueCards, greenCards } from "./data/mythicCards/index";
+import difficulties from "./data/difficulties";
 
-const ancient = document.querySelectorAll('.ancient-card');
-const ancients = document.querySelector('.ancients-container');
-const difficulty = document.querySelector('.difficulty-container')
+const ancient = document.querySelectorAll(".ancient-card");
+const ancients = document.querySelector(".ancients-container");
+const difficulty = document.querySelector(".difficulty-container");
 let selectedA;
 let selected2;
-const shuffleButton = document.querySelector('.shuffle-button');
-const currentState = document.querySelector('.current-state');
-const deck = document.querySelector('.deck');
-const lastCard = document.querySelector('.last-card');
+const shuffleButton = document.querySelector(".shuffle-button");
+const currentState = document.querySelector(".current-state");
+const deck = document.querySelector(".deck");
+const lastCard = document.querySelector(".last-card");
 let randomNum;
-let currentAncient = '';
-const oneGreen = document.querySelector('.dot.green.one');
-const oneBrown = document.querySelector('.dot.brown.one');
-const oneBlue = document.querySelector('.dot.blue.one');
-const twoGreen = document.querySelector('.dot.green.two');
-const twoBrown = document.querySelector('.dot.brown.two');
-const twoBlue = document.querySelector('.dot.blue.two');
-const thirdGreen = document.querySelector('.dot.green.third');
-const thirdBrown = document.querySelector('.dot.brown.third');
-const thirdBlue = document.querySelector('.dot.blue.third');
-
+let currentAncient = "";
+const oneGreen = document.querySelector(".dot.green.one");
+const oneBrown = document.querySelector(".dot.brown.one");
+const oneBlue = document.querySelector(".dot.blue.one");
+const twoGreen = document.querySelector(".dot.green.two");
+const twoBrown = document.querySelector(".dot.brown.two");
+const twoBlue = document.querySelector(".dot.blue.two");
+const thirdGreen = document.querySelector(".dot.green.third");
+const thirdBrown = document.querySelector(".dot.brown.third");
+const thirdBlue = document.querySelector(".dot.blue.third");
+let firstStageCards = [];
+let secondStageCards = [];
+let thirdStageCards = [];
+let clicks = 0;
 
 //выбор древнего
-ancients.onclick = function(event) {
-    let a = event.target.closest('.ancient-card');
-    if (!a) return;
-    if (!ancients.contains(a)) return;
-    highlight(a); 
-    difficulty.style.visibility = 'visible';
-    currentAncient = event.target.id; 
-    const foundObj = ancientsData.find(item => item.name === currentAncient);
-    getCurrentState(foundObj);
-  getColorDeck(foundObj);
-  takeStageDeck(foundObj);
+ancients.onclick = function (event) {
+  let a = event.target.closest(".ancient-card");
+  if (!a) return;
+  if (!ancients.contains(a)) return;
+  highlight(a);
+  difficulty.style.visibility = "visible";
+  currentAncient = event.target.id;
+  currentAncient = ancientsData.find((item) => item.name === currentAncient);
+  newAncient();
 };
+
+//
+function newAncient() {
+  currentState.style.visibility = "";
+  deck.style.visibility = "";
+  lastCard.style.visibility = "";
+  selected2.classList.remove("active");
+  firstStageCards = [];
+  secondStageCards = [];
+  thirdStageCards = [];
+  clicks = 0;
+}
 
 let greenCardDeck;
 let brownCardDeck;
 let blueCardDeck;
 //колоды всех цветов
-function getColorDeck (foundObj) {
-    let countGreen = cardsSum('greenCards', foundObj);
-    let countBrown = cardsSum('brownCards', foundObj);
-    let countBlue = cardsSum('blueCards', foundObj);
-    greenCardDeck = shuffleArray(greenCards).slice(0, countGreen);
-    brownCardDeck = shuffleArray(brownCards).slice(0, countBrown);
-    blueCardDeck = shuffleArray(blueCards).slice(0, countBlue);
+function getColorDeck(foundObj) {
+  let countGreen = cardsSum("greenCards", foundObj);
+  let countBrown = cardsSum("brownCards", foundObj);
+  let countBlue = cardsSum("blueCards", foundObj);
+  greenCardDeck = shuffleArray(greenCards).slice(0, countGreen);
+  brownCardDeck = shuffleArray(brownCards).slice(0, countBrown);
+  blueCardDeck = shuffleArray(blueCards).slice(0, countBlue);
   console.log(greenCardDeck);
 }
 
 //подсветка карты
 function highlight(a) {
-    if (selectedA) { 
-      selectedA.classList.remove('active');
-    }
-    selectedA = a;
-    selectedA.classList.add('active');
+  if (selectedA) {
+    selectedA.classList.remove("active");
+  }
+  selectedA = a;
+  selectedA.classList.add("active");
 }
-  
+
 //выбор сложности
-difficulty.onclick = function(event) {
-    let a = event.target.closest('.difficulty');
-    if (!a) return;
-    if (!difficulty.contains(a)) return;
-    highlight2(a); 
-    shuffleButton.style.visibility = 'visible';
+difficulty.onclick = function (event) {
+  let a = event.target.closest(".difficulty");
+  if (!a) return;
+  if (!difficulty.contains(a)) return;
+  highlight2(a);
+  shuffleButton.style.visibility = "visible";
 };
 
 //подсветка сложности
 function highlight2(a) {
-    if (selected2) { 
-      selected2.classList.remove('active');
-    }
-    selected2 = a;
-    selected2.classList.add('active');
+  if (selected2) {
+    selected2.classList.remove("active");
+  }
+  selected2 = a;
+  selected2.classList.add("active");
 }
 
 //замешать колоду кнопка
-shuffleButton.onclick = function(event) {
-    shuffleButton.style.visibility = '';
-    currentState.style.visibility = 'visible';
-  deck.style.visibility = 'visible';
+shuffleButton.onclick = function (event) {
+  shuffleButton.style.visibility = "";
+  currentState.style.visibility = "visible";
+  deck.style.visibility = "visible";
+  lastCard.style.visibility = "";
+  getCurrentState(currentAncient);
+  getColorDeck(currentAncient);
+  takeStageDeck(currentAncient);
 };
 
 //рандом
 function getRandom(min, max) {
-    randomNum = Math.floor(Math.random() * max + min);
-  }
-  getRandom();
+  randomNum = Math.floor(Math.random() * max + min);
+}
+getRandom();
 
 //тасовка карт
 // function shuffle(array) {
@@ -119,19 +132,15 @@ function getCurrentState(currentAncient) {
   thirdGreen.textContent = currentAncient.thirdStage.greenCards;
   thirdBrown.textContent = currentAncient.thirdStage.brownCards;
   thirdBlue.textContent = currentAncient.thirdStage.blueCards;
- }
-
-//сколько карт отобрать из колоды
-function cardsSum (color, obj) {
-    return obj.firstStage[color] + obj.secondStage[color] + obj.thirdStage[color];
 }
 
-let firstStageCards =[];
-let secondStageCards = [];
-let thirdStageCards = [];
+//сколько карт отобрать из колоды
+function cardsSum(color, obj) {
+  return obj.firstStage[color] + obj.secondStage[color] + obj.thirdStage[color];
+}
 
 //получаем три колоды по стадиям
-function takeStageDeck(currentAncient){
+function takeStageDeck(currentAncient) {
   for (let i = 0; i < currentAncient.firstStage.greenCards; i++) {
     firstStageCards.push(greenCardDeck[greenCardDeck.length - 1]);
     greenCardDeck.pop();
@@ -176,35 +185,63 @@ function takeStageDeck(currentAncient){
   console.log(firstStageCards);
   console.log(secondStageCards);
   console.log(thirdStageCards);
-   }
-
-   //общая колода
-   function getCardsDeck() {
-     let deckResult = [].concat(firstStageCards, secondStageCards, thirdStageCards);
-     console.log(deckResult);
-     return deckResult;
 }
 
-// const cardNum = String(randomNum);
-// const img = new Image();
-// img.src = `./assets/MythicCards/blue/blue${cardNum}.png`
-// img.onload = () => {
-//   lastCard.style.backgroundImage = `url(${img.src})`
-// }
+//общая колода
+function getCardsDeck() {
+  let deckResult = [].concat(
+    firstStageCards,
+    secondStageCards,
+    thirdStageCards
+  );
+  console.log(deckResult);
+  return deckResult;
+}
 
 ///клик по колоде
-let clicks = 0;
-deck.addEventListener('click', () => {
-    lastCard.style.visibility = 'visible';
+deck.addEventListener("click", () => {
+  lastCard.style.visibility = "visible";
   const result = getCardsDeck();
-  console.log(result[clicks].cardFace);
   if (clicks < result.length) {
     let img = result[clicks].cardFace;
-     lastCard.style.backgroundImage = `url(${img})`;
-             clicks++;
-            console.log(clicks);
-         }
-  if (clicks >= result.length) {
-    deck.style.visibility = '';
+    lastCard.style.backgroundImage = `url(${img})`;
+
+    if (clicks < firstStageCards.length) {
+      if (result[clicks].color === "green") {
+        oneGreen.textContent = oneGreen.textContent - 1;
+      }
+      if (result[clicks].color === "brown") {
+        oneBrown.textContent = oneBrown.textContent - 1;
+      }
+      if (result[clicks].color === "blue") {
+        oneBlue.textContent = oneBlue.textContent - 1;
+      }
+    } else if (clicks < firstStageCards.length + secondStageCards.length) {
+      if (result[clicks].color === "green") {
+        twoGreen.textContent = twoGreen.textContent - 1;
+      }
+      if (result[clicks].color === "brown") {
+        twoBrown.textContent = twoBrown.textContent - 1;
+      }
+      if (result[clicks].color === "blue") {
+        twoBlue.textContent = twoBlue.textContent - 1;
+      }
+    } else {
+      if (result[clicks].color === "green") {
+        thirdGreen.textContent = thirdGreen.textContent - 1;
+      }
+      if (result[clicks].color === "brown") {
+        thirdBrown.textContent = thirdBrown.textContent - 1;
+      }
+      if (result[clicks].color === "blue") {
+        thirdBlue.textContent = thirdBlue.textContent - 1;
+      }
+    }
+
+    clicks++;
+    console.log(clicks);
   }
-})
+  if (clicks >= result.length) {
+    deck.style.visibility = "";
+  }
+});
