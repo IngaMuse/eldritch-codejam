@@ -137,6 +137,6 @@ body {
     visibility: hidden;
 }
 
-.very-light, .light, .very-hard, .hard{
-    visibility: hidden;
+.done {
+   color: red;
 }

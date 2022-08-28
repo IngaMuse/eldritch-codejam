@@ -3,7 +3,6 @@ import ancientsData from "./data/ancients";
 import { brownCards, blueCards, greenCards } from "./data/mythicCards/index";
 import difficulties from "./data/difficulties";
 
-const ancient = document.querySelectorAll(".ancient-card");
 const ancients = document.querySelector(".ancients-container");
 const difficulty = document.querySelector(".difficulty-container");
 let selectedA;
@@ -12,8 +11,8 @@ const shuffleButton = document.querySelector(".shuffle-button");
 const currentState = document.querySelector(".current-state");
 const deck = document.querySelector(".deck");
 const lastCard = document.querySelector(".last-card");
-let randomNum;
 let currentAncient = "";
+let currentDifficulty;
 const oneGreen = document.querySelector(".dot.green.one");
 const oneBrown = document.querySelector(".dot.brown.one");
 const oneBlue = document.querySelector(".dot.blue.one");
@@ -23,10 +22,14 @@ const twoBlue = document.querySelector(".dot.blue.two");
 const thirdGreen = document.querySelector(".dot.green.third");
 const thirdBrown = document.querySelector(".dot.brown.third");
 const thirdBlue = document.querySelector(".dot.blue.third");
+const stageText = document.querySelectorAll(".stage-text");
 let firstStageCards = [];
 let secondStageCards = [];
 let thirdStageCards = [];
 let clicks = 0;
+let greenCardDeck;
+let brownCardDeck;
+let blueCardDeck;
 
 //выбор древнего
 ancients.onclick = function (event) {
@@ -40,29 +43,91 @@ ancients.onclick = function (event) {
   newAncient();
 };
 
-//
+//обнуление данных
 function newAncient() {
   currentState.style.visibility = "";
   deck.style.visibility = "";
   lastCard.style.visibility = "";
-  selected2.classList.remove("active");
   firstStageCards = [];
   secondStageCards = [];
   thirdStageCards = [];
   clicks = 0;
+  stageText[0].classList.remove("done");
+  stageText[1].classList.remove("done");
+  stageText[2].classList.remove("done");
 }
 
-let greenCardDeck;
-let brownCardDeck;
-let blueCardDeck;
 //колоды всех цветов
 function getColorDeck(foundObj) {
   let countGreen = cardsSum("greenCards", foundObj);
   let countBrown = cardsSum("brownCards", foundObj);
   let countBlue = cardsSum("blueCards", foundObj);
-  greenCardDeck = shuffleArray(greenCards).slice(0, countGreen);
-  brownCardDeck = shuffleArray(brownCards).slice(0, countBrown);
-  blueCardDeck = shuffleArray(blueCards).slice(0, countBlue);
+  let greenDeck = greenCards;
+  let brownDeck = brownCards;
+  let blueDeck = blueCards;
+  let greenDeckNormal = greenCards.filter((item) => item.difficulty === 'normal');
+  let brownDeckNormal = brownCards.filter((item) => item.difficulty === 'normal');
+  let blueDeckNormal = blueCards.filter((item) => item.difficulty === 'normal');
+  if (currentDifficulty === 'easy') {
+    greenDeck = greenCards.filter((item) => item.difficulty !== 'hard');
+    brownDeck = brownCards.filter((item) => item.difficulty !== 'hard');
+    blueDeck = blueCards.filter((item) => item.difficulty !== 'hard');
+  }
+  if (currentDifficulty === 'hard') {
+    greenDeck = greenCards.filter((item) => item.difficulty !== 'easy');
+    brownDeck = brownCards.filter((item) => item.difficulty !== 'easy');
+    blueDeck = blueCards.filter((item) => item.difficulty !== 'easy');
+  }
+  if (currentDifficulty === 'veryEasy') {
+    greenDeck = greenCards.filter((item) => item.difficulty === 'easy');
+    if (greenDeck.length < countGreen) {
+      let moreDeck = countGreen - greenDeck.length;
+      greenDeckNormal =shuffleArray(greenDeckNormal).slice(0, moreDeck);
+      greenDeck = greenDeck.concat(greenDeckNormal);
+      console.log(moreDeck);
+    }
+    brownDeck = brownCards.filter((item) => item.difficulty === 'easy');
+    if (brownDeck.length < countBrown) {
+      let moreDeck = countBrown - brownDeck.length;
+      brownDeckNormal =shuffleArray(brownDeckNormal).slice(0, moreDeck);
+      brownDeck = brownDeck.concat(brownDeckNormal);
+      console.log(moreDeck);
+    }
+    blueDeck = blueCards.filter((item) => item.difficulty === 'easy');
+    if (blueDeck.length < countBlue) {
+      let moreDeck = countBlue - blueDeck.length;
+      blueDeckNormal =shuffleArray(blueDeckNormal).slice(0, moreDeck);
+      blueDeck = blueDeck.concat(blueDeckNormal);
+      console.log(moreDeck);
+    }
+  }
+  if (currentDifficulty === 'veryHard') {
+    greenDeck = greenCards.filter((item) => item.difficulty === 'hard');
+    if (greenDeck.length < countGreen) {
+      let moreDeck = countGreen - greenDeck.length;
+      greenDeckNormal =shuffleArray(greenDeckNormal).slice(0, moreDeck);
+      greenDeck = greenDeck.concat(greenDeckNormal);
+      console.log(moreDeck);
+    }
+    brownDeck = brownCards.filter((item) => item.difficulty === 'hard');
+    if (brownDeck.length < countBrown) {
+      let moreDeck = countBrown - brownDeck.length;
+      brownDeckNormal =shuffleArray(brownDeckNormal).slice(0, moreDeck);
+      brownDeck = brownDeck.concat(brownDeckNormal);
+      console.log(moreDeck);
+    }
+    blueDeck = blueCards.filter((item) => item.difficulty === 'hard');
+    if (blueDeck.length < countBlue) {
+      let moreDeck = countBlue - blueDeck.length;
+      blueDeckNormal =shuffleArray(blueDeckNormal).slice(0, moreDeck);
+      blueDeck = blueDeck.concat(blueDeckNormal);
+      console.log(moreDeck);
+    }
+  }
+  //перемешать колоду отобранных по цветам карт и взять нужное количество
+  greenCardDeck = shuffleArray(greenDeck).slice(0, countGreen);
+  brownCardDeck = shuffleArray(brownDeck).slice(0, countBrown);
+  blueCardDeck = shuffleArray(blueDeck).slice(0, countBlue);
   console.log(greenCardDeck);
 }
 
@@ -82,6 +147,11 @@ difficulty.onclick = function (event) {
   if (!difficulty.contains(a)) return;
   highlight2(a);
   shuffleButton.style.visibility = "visible";
+  currentDifficulty = event.target.id;
+  currentDifficulty = difficulties.find((item) => item.id === currentDifficulty);
+  currentDifficulty = currentDifficulty.id;
+  console.log(currentDifficulty);
+  newAncient();
 };
 
 //подсветка сложности
@@ -104,19 +174,7 @@ shuffleButton.onclick = function (event) {
   takeStageDeck(currentAncient);
 };
 
-//рандом
-function getRandom(min, max) {
-  randomNum = Math.floor(Math.random() * max + min);
-}
-getRandom();
-
 //тасовка карт
-// function shuffle(array) {
-//   for (let i = array.length - 1; i > 0; i--) {
-//     let j = Math.floor(Math.random() * (i + 1));
-//     [array[i], array[j]] = [array[j], array[i]];
-//   }
-// }
 function shuffleArray(array) {
   return array.sort(() => Math.random() - 0.5);
 }
@@ -177,7 +235,7 @@ function takeStageDeck(currentAncient) {
     thirdStageCards.push(blueCardDeck[blueCardDeck.length - 1]);
     blueCardDeck.pop();
   }
-
+//перемешать колоды по стадиям
   firstStageCards = shuffleArray(firstStageCards);
   secondStageCards = shuffleArray(secondStageCards);
   thirdStageCards = shuffleArray(thirdStageCards);
@@ -205,7 +263,7 @@ deck.addEventListener("click", () => {
   if (clicks < result.length) {
     let img = result[clicks].cardFace;
     lastCard.style.backgroundImage = `url(${img})`;
-
+    //трекер
     if (clicks < firstStageCards.length) {
       if (result[clicks].color === "green") {
         oneGreen.textContent = oneGreen.textContent - 1;
@@ -217,6 +275,7 @@ deck.addEventListener("click", () => {
         oneBlue.textContent = oneBlue.textContent - 1;
       }
     } else if (clicks < firstStageCards.length + secondStageCards.length) {
+      stageText[0].classList.add("done");
       if (result[clicks].color === "green") {
         twoGreen.textContent = twoGreen.textContent - 1;
       }
@@ -227,6 +286,7 @@ deck.addEventListener("click", () => {
         twoBlue.textContent = twoBlue.textContent - 1;
       }
     } else {
+      stageText[1].classList.add("done");
       if (result[clicks].color === "green") {
         thirdGreen.textContent = thirdGreen.textContent - 1;
       }
@@ -237,11 +297,11 @@ deck.addEventListener("click", () => {
         thirdBlue.textContent = thirdBlue.textContent - 1;
       }
     }
-
     clicks++;
     console.log(clicks);
   }
   if (clicks >= result.length) {
     deck.style.visibility = "";
+    stageText[2].classList.add("done");
   }
 });
