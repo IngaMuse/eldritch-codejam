@@ -121,10 +121,16 @@ body {
     cursor: pointer;
 }
 
+.decks {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
 .deck-container .deck, .deck-container .last-card {
     background-size: cover;
-    height: 190px;
-    width: 130px;
+    height: 370px;
+    width: 270px;
     visibility: hidden;
 }
 
